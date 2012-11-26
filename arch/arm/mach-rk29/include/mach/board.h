@@ -23,6 +23,8 @@
 #include <linux/notifier.h>
 #include <mach/rk29_m803.h>
 
+#define CM9_KERNEL
+//#define CM10_KERNEL
 struct adc_battery_platform_data {
         int adc_chn;
 

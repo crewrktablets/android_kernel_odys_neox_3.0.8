@@ -276,26 +276,29 @@ static int mma7660_get_data(struct i2c_client *client)
 	z =  mma7660_convert_to_int(buffer[MMA7660_REG_Z_OUT])*ZSENSIT;
 	
 #if defined(CONFIG_MACH_RK29_ODYS_NEOX8)
-/* CM10
+#if defined(CM10_KERNEL)
+/* CM10 */
 	axis.x = -x;
 	axis.y = -y;
 	axis.z = z;
-*/
+#else
 /* JB */
 	axis.x = x;
 	axis.y = -z;
 	axis.z = y;
-
+#endif
 #elif defined(CONFIG_MACH_RK29_ODYS_NEOX7)
-/* CM10
+#if defined(CM10_KERNEL)
+/* CM10 */
 	axis.x = x;
 	axis.y = y;
 	axis.z = z;
-*/
+#else
 /* JB */
 	axis.x = -x;
 	axis.y = -z;
 	axis.z = -y;
+#endif
 #else
 	axis.x = y;
 	axis.y = -x;
