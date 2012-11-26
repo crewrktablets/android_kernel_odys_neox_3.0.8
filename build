@@ -1,22 +1,22 @@
 
 make mrproper
 make odys-neox8_defconfig
-make -j3 kernel.img 2>&1 | tee build.log
+make -j3 kernel.img 2>&1 | tee build-neox8.log
 cp kernel.img ../NEOX8
 
 make mrproper
 make odys-neox7_defconfig
-make -j3 kernel.img 2>&1 | tee build.log
+make -j3 kernel.img 2>&1 | tee build-neox7.log
 cp kernel.img ../NEOX7
 
 make mrproper
 make bq-kepler2_defconfig
-make -j3 kernel.img 2>&1 | tee build.log
+make -j3 kernel.img 2>&1 | tee build-kepler2.log
 cp kernel.img ../Kepler2
 
 make mrproper
 make bq-pascal2_defconfig
-make -j3 kernel.img 2>&1 | tee build.log
+make -j3 kernel.img 2>&1 | tee buildpascal2.log
 cp kernel.img ../Pascal2
 
 make clean
