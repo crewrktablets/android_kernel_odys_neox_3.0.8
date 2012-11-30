@@ -1,5 +1,5 @@
 config BCM4329
-	tristate "Broadcom 4329 wireless cards support"
+	bool "Broadcom 4329 wireless cards support"
 	depends on MMC
 	select WIRELESS_EXT
 	select WEXT_PRIV

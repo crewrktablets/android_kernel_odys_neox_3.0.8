@@ -4809,7 +4809,7 @@ wl_iw_get_txpow(
 
 	disable = dtoh32(disable);
 	result = (uint8)(txpwrdbm & ~WL_TXPWR_OVERRIDE);
-	vwrq->value = (int32)bcm_qdbm_to_mw(result);
+	vwrq->value = (int32)123; // bcm_qdbm_to_mw(result);
 	vwrq->fixed = 0;
 	vwrq->disabled = (disable & (WL_RADIO_SW_DISABLE | WL_RADIO_HW_DISABLE)) ? 1 : 0;
 	vwrq->flags = IW_TXPOW_MWATT;

@@ -166,9 +166,6 @@ static inline unsigned long cpufreq_scale(unsigned long old, u_int div, u_int mu
 #define CPUFREQ_GOV_START  1
 #define CPUFREQ_GOV_STOP   2
 #define CPUFREQ_GOV_LIMITS 3
-#ifdef CONFIG_CPU_FREQ_USR_EVNT_NOTIFY
-#define CPUFREQ_GOV_USRENET 4
-#endif
 
 struct cpufreq_governor {
 	char	name[CPUFREQ_NAME_LEN];
@@ -256,10 +253,7 @@ int cpufreq_unregister_driver(struct cpufreq_driver *driver_data);
 
 
 void cpufreq_notify_transition(struct cpufreq_freqs *freqs, unsigned int state);
-#ifdef CONFIG_CPU_FREQ_USR_EVNT_NOTIFY
-/* user event notification */
-void cpufreq_user_event_notify(void);
-#endif
+
 
 static inline void cpufreq_verify_within_limits(struct cpufreq_policy *policy, unsigned int min, unsigned int max)
 {
