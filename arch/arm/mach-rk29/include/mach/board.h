@@ -23,7 +23,7 @@
 #include <linux/notifier.h>
 #include <mach/rk29_m803.h>
 
-#define CM9_KERNEL
+//#define CM9_KERNEL
 //#define CM10_KERNEL
 struct adc_battery_platform_data {
         int adc_chn;
@@ -223,6 +223,16 @@ struct p1003_platform_data {
     int     (*init_platform_hw)(void);
     int     (*p1003_platform_sleep)(void);
     int     (*p1003_platform_wakeup)(void);
+    void    (*exit_platform_hw)(void);
+};
+// added by Astralix, port from 2.6.36.27
+struct sis809_platform_data {
+    u16     model;
+
+    int     (*get_pendown_state)(void);
+    int     (*init_platform_hw)(void);
+    int     (*platform_sleep)(void);
+    int     (*platform_wakeup)(void);
     void    (*exit_platform_hw)(void);
 };
 struct eeti_egalax_platform_data{

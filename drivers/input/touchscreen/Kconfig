@@ -973,6 +973,10 @@ config TOUCHSCREEN_GT819
 	tristate "GT819 based touchscreens"
 	depends on I2C2_RK29
 
+config I2C_SIS809
+	tristate "SIS809 based touchscreens"
+	depends on I2C2_RK29
+
 config TOUCHSCREEN_FT5301
 	bool "FT5301  TOUCHSCREEN"
 	depends on I2C2_RK29

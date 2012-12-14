@@ -776,6 +776,68 @@ struct bq27541_platform_data bq27541_info = {
 	.bat_check_pin =  BAT_LOW,
 };
 #endif
+#if defined (CONFIG_I2C_SIS809)
+
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+#define TOUCH_INT_PIN   RK29_PIN0_PA2
+
+static int sis809_init_platform_hw(void)
+{
+	if(gpio_request(TOUCH_RESET_PIN,NULL) != 0){
+		gpio_free(TOUCH_RESET_PIN);
+		printk("sis809_init_platform_hw TOUCH_RESET_PIN error\n");
+		return -EIO;
+	}
+
+	if(gpio_request(TOUCH_INT_PIN,NULL) != 0){
+		gpio_free(TOUCH_INT_PIN);
+		printk("sis809_init_platform_hw TOUCH_INT_PIN error\n");
+		return -EIO;
+	}
+
+	gpio_pull_updown(TOUCH_INT_PIN, 1);
+	gpio_direction_output(TOUCH_RESET_PIN, 0);
+	msleep(500);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	msleep(500);
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	//	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+void sis809_exit_platform_hw(void)
+{
+	printk("sis809_exit_platform_hw\n");
+	gpio_free(TOUCH_RESET_PIN);
+	gpio_free(TOUCH_INT_PIN);
+}
+
+int sis809_platform_sleep(void)
+{
+	printk("sis809_platform_sleep\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+	return 0;
+}
+
+int sis809_platform_wakeup(void)
+{
+	printk("sis809_platform_wakeup\n");
+	gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	//msleep(5);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_LOW);
+	//msleep(20);
+	//gpio_set_value(TOUCH_INT_PIN, GPIO_HIGH);
+	return 0;
+}
+
+static struct sis809_platform_data i2c_sis809_info = {
+	.model= 1003,
+	.init_platform_hw = sis809_init_platform_hw,
+	.exit_platform_hw = sis809_exit_platform_hw,
+	.platform_sleep   = sis809_platform_sleep,
+	.platform_wakeup  = sis809_platform_wakeup,
+};
+#endif 
 static struct android_pmem_platform_data android_pmem_pdata = {
 	.name		= "pmem",
 	.start		= PMEM_UI_BASE,
@@ -1587,6 +1649,15 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
       .platform_data  = &mma8452_info,
     },
 #endif
+#if defined (CONFIG_GS_MMA8452)
+    {
+      .type           = "gs_mma8452",
+      .addr           = 0x2a,
+      .flags          = 0,
+      .irq            = MMA8452_INT_PIN,
+      .platform_data  = &mma8452_info,
+    },
+#endif
 #if defined (CONFIG_COMPASS_AK8973)
 	{
 		.type    		= "ak8973",
@@ -1753,6 +1824,15 @@ static struct i2c_board_info __initdata board_i2c2_devices[] = {
 		.flags      =0,
 		.irq	=RK29_PIN0_PA2, // support goodix tp detect, 20110706
 		.platform_data = &ft5406_info,
+    },
+#endif
+#if defined (CONFIG_I2C_SIS809)
+    {
+      .type				= "sis809_touch",
+      .addr				= 0x5c, /* 0x5c in dev */
+      .flags			= 0,
+      .irq				= RK29_PIN0_PA2,
+      .platform_data	= &i2c_sis809_info,
     },
 #endif
 };

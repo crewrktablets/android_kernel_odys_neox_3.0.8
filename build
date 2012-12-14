@@ -1,45 +1,27 @@
+#!/bin/bash
+# build kernel for all devices
 
-make mrproper
-make odys-neox8_defconfig
-make -j3 kernel.img 2>&1 | tee build-neox8.log
-cp kernel.img ../NEOX8
-7z a ../JK-JB-NEOX8-oc1104_$(date +"%Y%m%d") kernel.img
+.setenv
 
-make mrproper
-make odys-neox7_defconfig
-make -j3 kernel.img 2>&1 | tee build-neox7.log
-cp kernel.img ../NEOX7
-7z a ../JK-JB-NEOX7-oc1104_$(date +"%Y%m%d") kernel.img
+DEVICES="odys-neox8 odys-neox7 bq-kepler2 bq-pascal2 M820c3G arnova-an8cg3 arnova-an9g2 hyundai-h900"
+KERNEL_PATH="../kernels"
 
-make mrproper
-make bq-kepler2_defconfig
-make -j3 kernel.img 2>&1 | tee build-kepler2.log
-cp kernel.img ../Kepler2
-7z a ../JK-JB-Kepler2-oc1104_$(date +"%Y%m%d") kernel.img
-
-make mrproper
-make bq-pascal2_defconfig
-make -j3 kernel.img 2>&1 | tee buildpascal2.log
-cp kernel.img ../Pascal2
-7z a ../JK-JB-Pascal2-oc1104_$(date +"%Y%m%d") kernel.img
-
-make mrproper
-make bq-pascal2_defconfig
-make -j3 kernel.img 2>&1 | tee buildpascal2.log
-cp kernel.img ../Pascal2
-7z a ../JK-JB-Pascal2-oc1104_$(date +"%Y%m%d") kernel.img
-
-make mrproper
-make M820c3G_defconfig
-make -j3 kernel.img 2>&1 | tee buildM820c3G.log
-cp kernel.img ../M820c3G
-7z a ../JK-JB-M820c3G-oc1104_$(date +"%Y%m%d") kernel.img
-
-make mrproper
-make arnova-an8cg3_defconfig
-make -j3 kernel.img 2>&1 | tee buildAN8cG3.log
-cp kernel.img ../AN8cG3
-7z a ../JK-JB-AN8cG3-oc1104_$(date +"%Y%m%d") kernel.img
-
+make distclean
+# loop through each device
+for device in ${DEVICES} ; do
+  echo "***\n*** Building kernel for device: ${device} ***\n***\n"
+  make clean
+  make ${device}_defconfig
+  mkdir -p ${KERNEL_PATH}/${device}
+  make $1 kernel.img modules 2>&1 | tee build_${device}_$(date +"%Y%m%d").log
+  cp kernel.img ${KERNEL_PATH}/${device}/
+  7z a ${KERNEL_PATH}/JK_JB308_${device}_oc1104_$(date +"%Y%m%d") kernel.img
+  # create package of all available modules
+  MODULES=`find . -name '*.ko'`
+  tar cjvf ${KERNEL_PATH}/modules_JK_JB308_${rev}.tar.bz2 ${MODULES}
+done
 make clean
 
+echo "Done"
+
+exit 0

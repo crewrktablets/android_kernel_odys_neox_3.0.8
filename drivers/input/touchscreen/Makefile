@@ -80,6 +80,7 @@ obj-$(CONFIG_TOUCHSCREEN_ILI2102_IIC)	+= ili2102_ts.o
 obj-$(CONFIG_D70_L3188A)		+= goodix_touch.o
 obj-$(CONFIG_TOUCHSCREEN_GT8XX)                += rk29_i2c_goodix.o
 obj-$(CONFIG_TOUCHSCREEN_FT5406)	+= ft5406_ts.o
+obj-$(CONFIG_I2C_SIS809)			+= sis809_ts.o
 obj-$(CONFIG_TOUCHSCREEN_FT5301)	+= ft5301.o
 obj-$(CONFIG_TOUCHSCREEN_FT5306)	+= ft5306_ts.o
 obj-$(CONFIG_TOUCHSCREEN_GT819)		+= gt819.o
