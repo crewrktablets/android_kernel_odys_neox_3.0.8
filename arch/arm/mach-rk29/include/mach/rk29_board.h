@@ -36,7 +36,7 @@
 /* Base */
 #define OUT_TYPE		SCREEN_RGB
 #define OUT_FACE		OUT_P888
-#define OUT_CLK		40000000
+#define OUT_CLK			40000000
 #define LCDC_ACLK		150000000     //29 lcdc axi DMA
 
 /* Timing */
@@ -52,7 +52,7 @@
 
 /* Other */
 #define DCLK_POL		0
-#define SWAP_RB		0
+#define SWAP_RB			0
 
 #define LCD_WIDTH       202
 #define LCD_HEIGHT      152
@@ -83,6 +83,31 @@
 #define LCD_HEIGHT      	87 
 
 #elif defined(CONFIG_MACH_RK29_ODYS_Q)
+/* Base */
+#define OUT_TYPE		SCREEN_RGB
+#define OUT_FACE		OUT_P888
+#define OUT_CLK			40000000
+#define LCDC_ACLK		150000000     //29 lcdc axi DMA
+
+/* Timing */
+#define H_PW			1
+#define H_BP			46
+#define H_VD			1024
+#define H_FP			210
+
+#define V_PW			3
+#define V_BP			23
+#define V_VD			768
+#define V_FP			12
+
+/* Other */
+#define DCLK_POL		0
+#define SWAP_RB			0
+
+#define LCD_WIDTH       202
+#define LCD_HEIGHT      152
+
+#elif defined(CONFIG_MACH_RK29_HYUNDAI_H900)
 /* Base */
 #define OUT_TYPE		SCREEN_RGB
 #define OUT_FACE		OUT_D888_P666

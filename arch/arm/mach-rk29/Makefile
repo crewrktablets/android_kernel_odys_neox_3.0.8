@@ -18,6 +18,7 @@ obj-$(CONFIG_MACH_RK29SDK_DDR3) += board-rk29-ddr3sdk.o board-rk29sdk-key.o boar
 obj-$(CONFIG_MACH_RK29_ODYS_NEOX8) += board-odys-neox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_RK29_ODYS_NEOX7) += board-odys-neox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_RK29_ODYS_Q) += board-odys-neox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
+obj-$(CONFIG_MACH_RK29_HYUNDAI_H900) += board-odys-neox.o board-rk29sdk-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_RK29_PHONESDK) += board-rk29-phonesdk.o board-rk29-phonesdk-key.o board-rk29-phonesdk-rfkill.o
 obj-$(CONFIG_MACH_RK29FIH) += board-rk29-fih.o board-rk29-fih-key.o board-rk29sdk-rfkill.o board-rk29sdk-power.o
 obj-$(CONFIG_MACH_RK29_A22) += board-rk29-a22.o board-rk29-a22-key.o board-rk29-a22-rfkill.o
