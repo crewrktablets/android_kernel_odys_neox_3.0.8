@@ -1050,6 +1050,33 @@ struct rk2818_gs_platform_data rk2818_gs_platdata = {
 };
 #endif
 
+#if defined (CONFIG_GS_LIS3DH)
+#define LIS3DH_INT_PIN   RK29_PIN0_PA3
+
+static int lis3dh_init_platform_hw(void)
+{
+	if(gpio_request(LIS3DH_INT_PIN,NULL) != 0)
+	{
+		gpio_free(LIS3DH_INT_PIN);
+		printk("lis3dh_init_platform_hw gpio_request error\n");
+		return -EIO;
+    }
+	else
+	{
+		printk("lis3dh_init_platform_hw gpio_request ok\n");
+	}
+	
+    gpio_pull_updown(LIS3DH_INT_PIN, 1);
+    return 0;
+}
+
+static struct gsensor_platform_data lis3dh_info = {
+	.swap_xyz			= 1,
+	.init_platform_hw	= lis3dh_init_platform_hw,
+	.orientation = { 0, -1, 0, 0, 0, -1, -1, 0, 0},
+};
+#endif
+
 /*mpu3050*/
 #if defined (CONFIG_MPU_SENSORS_MPU3050)
 static struct mpu_platform_data mpu3050_data = {
@@ -1657,6 +1684,15 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
       .irq            = MMA8452_INT_PIN,
       .platform_data  = &mma8452_info,
     },
+#endif
+#if defined (CONFIG_GS_LIS3DH)
+	{
+		.type	        = "gs_lis3dh",
+		.addr	        = 0x19,   //0x19(SA0-->VCC), 0x18(SA0-->GND)
+		.flags	        = 0,
+		.irq	        = LIS3DH_INT_PIN,
+		.platform_data = &lis3dh_info,
+	},
 #endif
 #if defined (CONFIG_COMPASS_AK8973)
 	{
