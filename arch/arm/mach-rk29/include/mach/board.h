@@ -21,7 +21,7 @@
 #include <linux/types.h>
 #include <linux/timer.h>
 #include <linux/notifier.h>
-#include <mach/rk29_m803.h>
+#include <mach/rk29_board.h>
 
 //#define CM9_KERNEL
 //#define CM10_KERNEL
