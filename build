@@ -1,7 +1,7 @@
 #!/bin/bash
 # build kernel for all devices
 
-.setenv
+
 
 DEVICES="odys-neox8 odys-neox7 bq-kepler2 bq-pascal2 M820c3G arnova-an8cg3 arnova-an9g2 hyundai-h900"
 KERNEL_PATH="../kernels"
@@ -14,8 +14,8 @@ for device in ${DEVICES} ; do
   make ${device}_defconfig
   mkdir -p ${KERNEL_PATH}/${device}
   make $1 kernel.img modules 2>&1 | tee build_${device}_$(date +"%Y%m%d").log
-  cp kernel.img ${KERNEL_PATH}/${device}/
-  7z a ${KERNEL_PATH}/JK_JB308_${device}_oc1104_$(date +"%Y%m%d") kernel.img
+  mv kernel.img ${KERNEL_PATH}/${device}/
+  7z a ${KERNEL_PATH}/JK_JB308_${device}_oc1104_$(date +"%Y%m%d") ${KERNEL_PATH}/${device}/kernel.img
   # create package of all available modules
   MODULES=`find . -name '*.ko'`
   tar cjvf ${KERNEL_PATH}/modules_JK_JB308_${rev}.tar.bz2 ${MODULES}
