@@ -15,6 +15,20 @@ static struct rk29_keys_button key_button[] = {
 		.gpio	= RK29_PIN6_PA5,
 		.active_low = PRESS_LEV_LOW,
 	},
+#if defined(CONFIG_MACH_RK29_ODYS_Q)
+	{
+		.desc	= "vol+",
+		.code	= KEY_VOLUMEDOWN,
+		.gpio	= RK29_PIN6_PA1, /*RK29_PIN6_PA3,*/
+		.active_low = PRESS_LEV_LOW,
+	},
+	{
+		.desc	= "vol-",
+		.code	= KEY_VOLUMEUP,
+		.gpio	= RK29_PIN6_PA2, /*RK29_PIN6_PA0,*/
+		.active_low = PRESS_LEV_LOW,
+	},
+#else
 	{
 		.desc	= "vol+",
 		.code	= KEY_VOLUMEUP,
@@ -27,6 +41,7 @@ static struct rk29_keys_button key_button[] = {
 		.gpio	= RK29_PIN6_PA2, /*RK29_PIN6_PA0,*/
 		.active_low = PRESS_LEV_LOW,
 	},
+#endif
         /*
 	{
 		.desc	= "esc",

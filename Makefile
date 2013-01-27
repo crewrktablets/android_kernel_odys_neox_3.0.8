@@ -194,18 +194,8 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 export KBUILD_BUILDHOST := $(SUBARCH)
 #ARCH		?= $(SUBARCH)
 ARCH		?= arm
-#ifneq ($(wildcard ../toolchain/arm-eabi-4.4.0),)
-#CROSS_COMPILE	?= ../../toolchain/arm-eabi-4.4.0/bin/arm-eabi-
-#endif
-#ifneq ($(wildcard ../prebuilt/linux-x86/toolchain/arm-eabi-4.4.0),)
-#CROSS_COMPILE	?= ../prebuilt/linux-x86/toolchain/arm-eabi-4.4.0/bin/arm-eabi-
-#endif
-#CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
-
-#CROSS_COMPILE	?= ../toolchain/arm-eabi-4.4.0/bin/arm-eabi-
-
-ifneq ($(wildcard ~/toolchain/arm-eCross-eabi),)
-CROSS_COMPILE	?= ../../toolchain/arm-eCross-eabi/bin/arm-eCross-eabi-
+ifneq ($(wildcard /opt/OSELAS.Toolchain-2011.11.3),)
+CROSS_COMPILE	?= /opt/OSELAS.Toolchain-2011.11.3/arm-cortexa8-linux-gnueabi/gcc-4.6.2-glibc-2.14.1-binutils-2.21.1a-kernel-2.6.39-sanitized/bin/arm-cortexa8-linux-gnueabi-
 endif
 ifneq ($(wildcard /usr/arm-linux-gnueabi),)
 CROSS_COMPILE	?= arm-none-linux-gnueabi-

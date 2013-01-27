@@ -270,7 +270,7 @@ static int mma7660_get_data(struct i2c_client *client)
         if (ret < 0)
             return ret;
     } while ((buffer[0] & 0x40) || (buffer[1] & 0x40) || (buffer[2] & 0x40));
-#if defined(CM10_KERNEL)
+#if defined(CM10_1_KERNEL)
 	x =  mma7660_convert_to_int(buffer[MMA7660_REG_X_OUT])*XSENSIT;
 	y =  mma7660_convert_to_int(buffer[MMA7660_REG_Y_OUT])*YSENSIT;
 	z =  mma7660_convert_to_int(buffer[MMA7660_REG_Z_OUT])*ZSENSIT;

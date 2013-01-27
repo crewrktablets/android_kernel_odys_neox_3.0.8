@@ -47,11 +47,14 @@ static struct wake_lock batt_wake_lock;
 int rk29_battery_dbg_level = 0;
 module_param_named(dbg_level, rk29_battery_dbg_level, int, 0644);
 
+#define ARNOVA_M16C
+//#define ARNOVA_M19
+
 /*******************ÒÔÏÂ²ÎÊý¿ÉÒÔÐÞ¸Ä******************************/
 #define	TIMER_MS_COUNTS		            50	//¶¨Ê±Æ÷µÄ³¤¶Èms
 //ÒÔÏÂ²ÎÊýÐèÒª¸ù¾ÝÊµ¼Ê²âÊÔµ÷Õû
 #define	SLOPE_SECOND_COUNTS	            15	//Í³¼ÆµçÑ¹Ð±ÂÊµÄÊ±¼ä¼ä¸ôs
-#define	DISCHARGE_MIN_SECOND	        70	//×î¿ì·Åµçµç1%Ê±¼ä
+#define	DISCHARGE_MIN_SECOND	            10			//×î¿ì·Åµçµç1%Ê±¼ä
 #define	CHARGE_MIN_SECOND	            45	//×î¿ì³äµçµç1%Ê±¼ä
 #define	CHARGE_MID_SECOND	            90	//ÆÕÍ¨³äµçµç1%Ê±¼ä
 #define	CHARGE_MAX_SECOND	            250	//×î³¤³äµçµç1%Ê±¼ä
@@ -67,31 +70,41 @@ module_param_named(dbg_level, rk29_battery_dbg_level, int, 0644);
 #define NUM_USBCHARGE_IDENTIFY_TIMES    ((USBCHARGE_IDENTIFY_TIMES * 1000) / TIMER_MS_COUNTS)	//³äµçÂú×´Ì¬³ÖÐøÊ±¼ä³¤¶È
 
 #define BAT_2V5_VALUE	                2500
-/*#define BATT_MAX_VOL_VALUE              4165	//ÂúµçÊ±µÄµç³ØµçÑ¹	 FOR A7
-#define BATT_ZERO_VOL_VALUE             3490	//¹Ø»úÊ±µÄµç³ØµçÑ¹
-#define BATT_NOMAL_VOL_VALUE            3800*/
 
+#ifdef ARNOVA_M16C
+	#define BAT_VOL_RATIO								(400/100)
+#endif
 
-#define BATT_MAX_VOL_VALUE		8140	//ÂúµçÊ±µÄµç³ØµçÑ¹	 FOR A7
-#define BATT_ZERO_VOL_VALUE 	6787	//¹Ø»úÊ±µÄµç³ØµçÑ¹
-#define BATT_NOMAL_VOL_VALUE	7450
+#ifdef ARNOVA_M19
+#define  BAT_VOL_RATIO                  6
+#endif
+
+#define BATT_MAX_VOL_VALUE              8303//4180	//ÂúµçÊ±µÄµç³ØµçÑ¹	 FOR A7
+//#define BATT_ZERO_VOL_VALUE             6800      //¿¿¿¿6.8v
+  #define BATT_ZERO_VOL_VALUE             6600      //¿¿¿¿   v 
+//#define BATT_NOMAL_VOL_VALUE            3800
 
 //¶¨ÒåADC²ÉÑù·ÖÑ¹µç×è£¬ÒÔÊµ¼ÊÖµÎª×¼£¬µ¥Î»K
-#define BAT_PULL_UP_R                   300
-#define BAT_PULL_DOWN_R                 100
+#define BAT_PULL_UP_R                   200
+#define BAT_PULL_DOWN_R                 200
 #define BAT_ADC_TABLE_LEN               11
-#define adc_to_voltage(adc_val) ((adc_val * BAT_2V5_VALUE * (BAT_PULL_UP_R + BAT_PULL_DOWN_R)) / (1024 * BAT_PULL_DOWN_R))
+#define adc_to_voltage(adc_val) ((adc_val * BAT_2V5_VALUE * BAT_VOL_RATIO) / 1024)
 
 static int adc_raw_table_bat[BAT_ADC_TABLE_LEN] = 
 {
-   /* 3490, 3597, 3628, 3641, 3660, 3697, 3747, 3809, 3879, 3945, 4165*/
-   6787, 6904, 7038, 7172, 7306, 7440, 7574, 7708, 7842, 7976, 8110
+//         0        10       20        30         40       50         60         70         80        90       	100
+//  6.8v ¿¿¿
+//     6800,    6889,   6963,    	7046,      7134,     7214,      7323,      7482,      7681,      7892,     8303
+      6618,    6825,     6946,     7024,      7077,      7164,     7307,     7475,     7648,     7864,     8313     
+
 };
 
 static int adc_raw_table_ac[BAT_ADC_TABLE_LEN] = 
 {
-    /*3600, 3760, 3800, 3827, 3845, 3885, 3950, 4007, 4078, 4140, 4200*/
-	 7287, 7414, 7488, 7642, 7740, 7840, 7910, 8000, 8060, 8210, 8310
+// 6.8v ¿¿¿
+//	7050,7136,7310,7393,7481,7561,7670,7829,8028,8239,8650
+//6.6v ¿¿¿
+      6868,    7075,   7196,      7274,       7327,     7414,      7557,    7725,      7898,    8114,      8563
 };
 
 extern int dwc_vbus_status(void);
@@ -607,6 +620,8 @@ static void rk29_adc_battery_timer_work(struct work_struct *work)
     	            gBatteryData->bat_voltage, gBatteryData->bat_capacity, capacitytmp, gBatCapacityDisChargeCnt, gBatCapacityChargeCnt);
     	}
     }
+	
+
 
 }
 
@@ -678,7 +693,7 @@ static int rk29_adc_battery_get_ac_property(struct power_supply *psy,
 		if (psy->type == POWER_SUPPLY_TYPE_MAINS)
 		{
 			printk("POWER_SUPPLY_TYPE_MAINS\n");
-			if (rk29_adc_battery_get_charge_level(gBatteryData))
+			if (rk29_adc_battery_get_charge_level(gBatteryData)&&(gpio_get_value(RK29_PIN4_PA3) != GPIO_HIGH))
 			{
 				val->intval = 1;
 				}
@@ -694,6 +709,7 @@ static int rk29_adc_battery_get_ac_property(struct power_supply *psy,
 		ret = -EINVAL;
 		break;
 	}
+
 	return ret;
 }
 
@@ -1037,7 +1053,7 @@ static void rk29_adc_battery_lowpower_check(struct rk29_adc_battery_data *bat)
     *********************************************/
     if (bat->bat_capacity == 0) bat->bat_capacity = 1;
     
-    if (bat->bat_voltage <= BATT_ZERO_VOL_VALUE + 50)
+    if (bat->bat_voltage <= BATT_ZERO_VOL_VALUE + 150)
     {
         printk("low battery: powerdown\n");
         gpio_direction_output(POWER_ON_PIN, GPIO_LOW);
@@ -1071,6 +1087,7 @@ static int rk29_adc_battery_probe(struct platform_device *pdev)
 	struct rk29_adc_battery_platform_data *pdata = pdev->dev.platform_data;
 	
 	printk("%s--%d:\n",__FUNCTION__,__LINE__);
+
 	data = kzalloc(sizeof(*data), GFP_KERNEL);
 	if (data == NULL) {
 		ret = -ENOMEM;
