@@ -1017,6 +1017,49 @@ struct kxtf9_platform_data kxtf9_pdata = {
 };
 #endif /* CONFIG_GS_KXTF9 */
 
+#if defined(CONFIG_TOUCHSCREEN_GOODIX_BIG)
+#define TOUCH_RESET_PIN RK29_PIN6_PC3
+//#define TOUCH_INT_PIN   RK29_PIN0_PA2
+
+int goodix_init_platform_hw(void)
+{
+	int ret;
+
+	printk("goodix_init_platform_hw\n");
+
+	ret = gpio_request(TOUCH_RESET_PIN, "goodix reset pin");
+	if(ret != 0){
+		gpio_free(TOUCH_RESET_PIN);
+		printk("goodix gpio_request error\n");
+		return -EIO;
+	}
+#if 0
+	ret = gpio_request(TOUCH_INT_PIN, "goodix irq pin");
+	if(ret != 0){
+		gpio_free(TOUCH_RESET_PIN);
+		gpio_free(TOUCH_INT_PIN);
+		printk("goodix gpio_request error\n");
+		return -EIO;
+	}
+
+    gpio_pull_updown(TOUCH_INT_PIN, 1);
+#endif
+    gpio_direction_output(TOUCH_RESET_PIN, 0);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_LOW);
+    mdelay(10);
+    gpio_set_value(TOUCH_RESET_PIN,GPIO_HIGH);
+	msleep(500);
+
+	return 0;
+}
+
+struct goodix_platform_data goodix_info = {
+	.model= 8105,
+	.rest_pin  = TOUCH_RESET_PIN,
+	//.int_pin   = TOUCH_INT_PIN,
+	.init_platform_hw = goodix_init_platform_hw,
+};
+#endif
 
 /*MMA8452 gsensor*/
 #if defined (CONFIG_GS_MMA8452)
@@ -1129,36 +1172,22 @@ struct bq27510_platform_data bq27510_info = {
 #endif
 
 #ifdef CONFIG_BATTERY_RK29_ADC
-/* commented by Yatto
-struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
+static struct rk29_adc_battery_platform_data rk29_adc_battery_platdata = {
 	.dc_det_pin      = RK29_PIN4_PA1,
 	.batt_low_pin    = RK29_PIN4_PA2,
 	.charge_set_pin  = INVALID_GPIO,
 	.charge_ok_pin   = RK29_PIN4_PA3,
-	
+
 	.dc_det_level    = GPIO_LOW,
 	.charge_ok_level = GPIO_HIGH,
-};*/
-static struct adc_battery_platform_data rk29_battery_data = {
-	.adc_chn = 0,
-	.dc_det_gpio = GPIO_DC_DET,
-	.chg_ok_gpio = GPIO_CHG_OK,
-
-	.batt_low_gpio    = INVALID_GPIO,
-	.charge_set_gpio  = INVALID_GPIO,
-	
-	.dc_det_level    = DC_DET_EFFECTIVE,
-#ifdef CHG_OK_EFFECTIVE
-	.chg_ok_level = CHG_OK_EFFECTIVE,
-#endif
 };
 
-struct platform_device rk29_device_battery = {
-		.name	= "rk29_battery",
-		.id 	= -1,
-		.dev = {
-			.platform_data = &rk29_battery_data,
-		}
+static struct platform_device rk29_device_adc_battery = {
+	.name   = "rk2918-battery",
+	.id     = -1,
+	.dev = {
+		.platform_data = &rk29_adc_battery_platdata,
+	},
 };
 #endif
 
@@ -1816,6 +1845,16 @@ static struct i2c_board_info __initdata board_i2c1_devices[] = {
     },
 #endif
 
+#if defined (CONFIG_TOUCHSCREEN_GOODIX_BIG)
+	{
+      .type           = "Goodix-TS",
+      .addr           = 0x55,
+      //.flags          = I2C_M_NEED_DELAY,//I2C_M_IGNORE_NAK,
+      .irq            = RK29_PIN0_PA2,
+      .platform_data  = &goodix_info,
+     // .udelay         = 50,
+    },
+#endif
 };
 #endif
 
@@ -2875,8 +2914,7 @@ static struct platform_device *devices[] __initdata = {
 	&rk29_device_adc,
 #endif
 #ifdef CONFIG_BATTERY_RK29_ADC
-    /*&rk29_adc_device_battery,  commented by Yatto */
-    &rk29_device_battery,
+	&rk29_device_adc_battery,
 #endif
 #ifdef CONFIG_BATTERY_RK2918
 	&rk2918_device_battery,

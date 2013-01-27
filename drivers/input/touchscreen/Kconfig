@@ -1024,4 +1024,14 @@ config ATMEL_MXT1386
                 default n
                 help
                   RK29 ATMEL_MXT1386 touch debug
+
+config TOUCHSCREEN_GOODIX_BIG
+        tristate "Goodix Big TouchScreen Driver"
+        depends on I2C2_RK29
+        default n
+        help
+                This is android driver to support the Goodix's GT8XX touchscreen
+                based on RK29 platform.
+                Support muti-touch
+
 endif

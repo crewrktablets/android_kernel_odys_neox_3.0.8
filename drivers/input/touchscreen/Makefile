@@ -86,4 +86,5 @@ obj-$(CONFIG_TOUCHSCREEN_FT5306)	+= ft5306_ts.o
 obj-$(CONFIG_TOUCHSCREEN_GT819)		+= gt819.o
 obj-$(CONFIG_TOUCHSCREEN_NAS)		+= nas_ts.o
 obj-$(CONFIG_LAIBAO_TS)		+= ft5x0x_i2c_ts.o
+obj-$(CONFIG_TOUCHSCREEN_GOODIX_BIG)      += goodix_touch_arnova.o
 obj-$(CONFIG_TOUCHSCREEN_PIXCIR)      += pixcir_i2c_ts.o
