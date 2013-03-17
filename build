@@ -1,6 +1,6 @@
 #!/bin/bash
 # build kernel for all devices
-# syntax: build <How much kernel> <ReleaseTag> [[<device>] [device]...]
+# syntax: build <How much cpu threads> <ReleaseTag> [[<device>] [device]...]
 # * if no device(s) is/are specified, ALL known devices are built
 
 # kown devices to be built
