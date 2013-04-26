@@ -15,7 +15,7 @@ CURRBRANCH=$(git branch | grep '*' | sed 's/*//;s/\s//g')
 
 # parameter $1 is used for -j flag
 if [ "" == "$1" ]; then
-  MAKE_OPTIONS="-j5"
+  MAKE_OPTIONS="-j4"
 else
   MAKE_OPTIONS="$1"
 fi
