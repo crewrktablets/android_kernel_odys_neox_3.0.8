@@ -64,6 +64,9 @@ config LOGO_SGI_CLUT224
 	depends on SGI_IP22 || SGI_IP27 || SGI_IP32 || X86_VISWS
 	default y
 
+config LOGO_CRK29_CLUT224
+		bool "CrewRkTablets logo for RK29 device"
+
 config LOGO_SUN_CLUT224
 	bool "224-color Sun Linux logo"
 	depends on SPARC

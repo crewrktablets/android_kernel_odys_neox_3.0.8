@@ -117,6 +117,10 @@ const struct linux_logo * __init_refok fb_find_logo(int depth)
         /* BQ Pascal2 logo */
         logo = &logo_pascal2_clut224;
 #endif
+#ifdef CONFIG_LOGO_CRK29_CLUT224
+        /* CrewRkTablets Logo RK2918 */
+        logo = &logo_crk2918_clut224;
+#endif
 #ifdef CONFIG_LOGO_BLACKFIN_CLUT224
 		/* Blackfin Linux logo */
 		logo = &logo_blackfin_clut224;
