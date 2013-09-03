@@ -20,6 +20,7 @@
 *.mod.c
 *.i
 *.lst
+*.log
 *.symtypes
 *.order
 modules.builtin

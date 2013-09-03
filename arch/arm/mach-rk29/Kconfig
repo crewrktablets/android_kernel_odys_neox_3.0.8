@@ -41,6 +41,12 @@ config MACH_RK29_HYUNDAI_H900
         help
           Support for the ROCKCHIP RK2918 based Android Tablet Hyundai H900.
 
+config MACH_RK29_UZONE_PAD_F4
+        depends on ARCH_RK29
+        bool "ROCKCHIP Board Rk29 For Uzone Pad-F4"
+        help
+          Support for the ROCKCHIP RK2918 based Android Tablet Uzone Pad-F4.
+
 config MACH_RK29_K97
         depends on ARCH_RK29
         bool "ROCKCHIP Board Rk29 For K97"

@@ -953,6 +953,9 @@ config LAIBAO_TS
 	help
 	  RK29 LAIBAO touchscreen
 
+config GOODIX_CAPACITIVE_TOUCHSCREEN_TR810
+	tristate "TR810 GOODIX_CAPACITIVE_TOUCHSCREEN based touchscreens"
+	depends on I2C2_RK29
 config TOUCHSCREEN_GT801_IIC
 	tristate "GT801_IIC based touchscreens"
 	depends on I2C2_RK29

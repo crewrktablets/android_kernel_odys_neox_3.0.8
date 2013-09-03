@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------------------------------------
+﻿/*---------------------------------------------------------------------------------------------------------
  * kernel/include/linux/goodix_queue.h
  *
  * Copyright(c) 2010 Goodix Technology Corp. All rights reserved.      
@@ -19,7 +19,10 @@
 struct point_node
 {
 	uint8_t num;
+	uint8_t is_key;
 	uint8_t state;
+	uint8_t key_state;
+	int     key_value;
 	uint8_t pressure;
 	unsigned int x;
 	unsigned int y;
