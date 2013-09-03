@@ -575,6 +575,11 @@ else
 KBUILD_CFLAGS	+= -O2
 endif
 
+# optimize for NEON FPU
+ifdef CONFIG_NEON
+KBUILD_CFLAGS	+= -mtune=cortex-a8 -mfpu=neon
+endif
+
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
 ifneq ($(CONFIG_FRAME_WARN),0)
