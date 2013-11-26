@@ -282,8 +282,8 @@ static int mma7660_get_data(struct i2c_client *client)
 	axis.z = z;
 #elif defined(JB422_KERNEL)
 	axis.x = -y;
-	axis.y = x;
-	axis.z = -z;
+	axis.y = -z;
+	axis.z = x;
 #else
 /* JB */
 	axis.x = x;
@@ -298,8 +298,8 @@ static int mma7660_get_data(struct i2c_client *client)
 	axis.z = z;
 #elif defined(JB422_KERNEL)
 	axis.x = z;
-	axis.y = -x;
-	axis.z = -y;
+	axis.y = -y;
+	axis.z = -x;
 #else
 /* JB */
 	axis.x = -x;

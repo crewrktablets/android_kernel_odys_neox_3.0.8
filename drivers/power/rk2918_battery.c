@@ -1433,8 +1433,12 @@ static int rk2918_battery_probe(struct platform_device *pdev)
 
 	setup_timer(&data->timer, rk2918_batscan_timer, (unsigned long)data);
 	// changed to notify android of status....
+	//JK 20131126 temporary for JB422/CM10.1 disabled, caused kernel crash with CM10.1 of Netlars
+	//we have to seek for reason. Perhaps our battery service fix is wrong for correct kernel.
+#ifndef JB422_KERNEL
 	data->timer.expires  = jiffies + 5000; // 2000
 	add_timer(&data->timer);
+#endif
    
 	INIT_WORK(&data->timer_work, rk2918_battery_timer_work);   
    
