@@ -551,9 +551,12 @@ static struct reginfo sensor_init_data[] =
 #endif
 
 	//-------------H_V_Switch(4)---------------//
+#if defined(JB422_KERNEL)
+			{0x14, 0x13},
+#else
 			{0x14 , 0x10 | (GC0308_MIRROR << 1) | GC0308_FLIP},  //0x10
-
-	 /*GC0308_H_V_Switch,
+#endif
+			/*GC0308_H_V_Switch,
 
 		1:  // normal
 	    		{0x14 , 0x10},
