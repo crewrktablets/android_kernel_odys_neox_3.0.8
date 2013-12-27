@@ -47,6 +47,12 @@ config MACH_RK29_UZONE_PAD_F4
         help
           Support for the ROCKCHIP RK2918 based Android Tablet Uzone Pad-F4.
 
+config MACH_RK29_BQ_KEPLER2HD
+        depends on ARCH_RK29
+        bool "ROCKCHIP Board Rk29 For BQ Kepler 2 HD"
+        help
+          Support for the ROCKCHIP RK2918 based Android Tablet BQ Kepler 2 HD.
+
 config MACH_RK29_K97
         depends on ARCH_RK29
         bool "ROCKCHIP Board Rk29 For K97"

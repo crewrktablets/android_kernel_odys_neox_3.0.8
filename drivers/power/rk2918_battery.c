@@ -54,7 +54,7 @@ int rk29_battery_dbg_level = 0;
 #define BAT_ADC_TABLE_LEN       11
 static int adc_raw_table_bat[BAT_ADC_TABLE_LEN] = 
 {
-#if defined (CONFIG_MACH_RK29_ODYS_NEOX8)
+#if defined (CONFIG_MACH_RK29_ODYS_NEOX8) || defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
 	3500, 3610, 3670, 3700, 3730, 3772, 3813, 3872, 3931, 3982, 4050
 #else
 	3490, 3597, 3628, 3641, 3660, 3697, 3747, 3809, 3879, 3945, 4165
@@ -63,7 +63,7 @@ static int adc_raw_table_bat[BAT_ADC_TABLE_LEN] =
 
 static int adc_raw_table_ac[BAT_ADC_TABLE_LEN] = 
 {
-#if defined (CONFIG_MACH_RK29_ODYS_NEOX8)
+#if defined (CONFIG_MACH_RK29_ODYS_NEOX8) || defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
 	3740, 3840, 3890, 3920, 3950, 3985, 4020, 4080, 4125, 4170, 4240
 #else
 	3600, 3760, 3800, 3827, 3845, 3885, 3950, 4007, 4078, 4140, 4200//4185//4301

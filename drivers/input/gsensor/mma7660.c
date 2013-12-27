@@ -274,7 +274,7 @@ static int mma7660_get_data(struct i2c_client *client)
 	y =  mma7660_convert_to_int(buffer[MMA7660_REG_X_OUT])*XSENSIT;
 	z =  mma7660_convert_to_int(buffer[MMA7660_REG_Z_OUT])*ZSENSIT;
 	
-#if defined(CONFIG_MACH_RK29_ODYS_NEOX8)
+#if defined(CONFIG_MACH_RK29_ODYS_NEOX8) || defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
 #if defined(CM10_KERNEL)
 /* CM10 */
 	axis.x = -x;

@@ -38,6 +38,11 @@
 #define SCREEN_MAX_Y 480
 #define PRESS_MAX 255
 
+#elif defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
+#define SCREEN_MAX_X 1024
+#define SCREEN_MAX_Y 768
+#define PRESS_MAX 200
+
 #else
 #define SCREEN_MAX_X 800
 #define SCREEN_MAX_Y 600
