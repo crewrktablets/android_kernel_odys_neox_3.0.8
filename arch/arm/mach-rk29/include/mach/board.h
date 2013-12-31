@@ -25,7 +25,7 @@
 
 //#define CM9_KERNEL
 //#define CM10_KERNEL
-//#define JB422_KERNEL
+#define JB422_KERNEL
 
 struct adc_battery_platform_data {
         int adc_chn;

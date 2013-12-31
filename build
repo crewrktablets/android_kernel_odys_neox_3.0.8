@@ -4,7 +4,7 @@
 # * if no device(s) is/are specified, ALL known devices are built
 
 # kown devices to be built
-KNOWNDEVICES="odys-neox8 odys-neox7 bq-kepler2 bq-pascal2 M820c3G arnova-an8cg3 arnova-an9g2 hyundai-h900 odys-q uzone_pad-f4"
+KNOWNDEVICES="odys-neox8 odys-neox7 bq-kepler2 bq-pascal2 M820c3G arnova-an8cg3 arnova-an9g2 hyundai-h900 uzone_pad-f4 next8psehd"
 # additional options for make
 # path to kernel archive
 KERNEL_PATH="../kernels"
