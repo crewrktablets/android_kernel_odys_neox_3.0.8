@@ -33,6 +33,7 @@ modules.builtin
 *.lzo
 *.patch
 *.gcno
+*.7z
 Untitled Project.*
 
 #
