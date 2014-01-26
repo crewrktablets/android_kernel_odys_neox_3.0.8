@@ -78,7 +78,7 @@
 #else
 #define SDRAM_SIZE          SZ_512M
 #endif
-#if defined(CONFIG_MACH_RK29_ODYS_Q)
+#if defined(CONFIG_MACH_RK29_ODYS_Q) || defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
 #define PMEM_GPU_SIZE       SZ_128M /* (128*SZ_1M)*/
 #define PMEM_UI_SIZE        SZ_48M /* (74 * SZ_1M)  1280x800: 64M 1024x768: 48M ... */
 #else
