@@ -18,6 +18,8 @@
  *	note: only support mulititouch	Wenfs 2010-10-01
  */
 
+
+
 #include <linux/input.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -34,6 +36,7 @@
 #include <linux/miscdevice.h>
 #include <linux/types.h>
 #include <linux/io.h>
+#include <linux/input/mt.h>
 #include <linux/delay.h>
 #include <linux/ioport.h>
 #include <linux/input-polldev.h>
@@ -63,12 +66,17 @@
 static struct early_suspend ft5406_power;
 
 
+#if 0
+#define printk_yj(msg...)  printk(msg)
+#else
+#define printk_yj(msg...)  
+#endif
 
 
-//#define CONFIG_FT5X0X_MULTITOUCH  1
+#define CONFIG_FT5X0X_MULTITOUCH  1
 #define MAX_POINT                 5
-#define FT5406_IIC_SPEED          200*1000    //300*1000
-#define TOUCH_RESET_PIN           RK29_PIN6_PC3
+#define FT5406_IIC_SPEED          400*1000    //300*1000
+//#define TOUCH_RESET_PIN           RK29_PIN6_PC3
 #define FT5X0X_REG_THRES          0x80         /* Thresshold, the threshold be low, the sensitivy will be high */
 #define FT5X0X_REG_REPORT_RATE    0x88         /* **************report rate, in unit of 10Hz **************/
 #define FT5X0X_REG_PMODE          0xA5         /* Power Consume Mode 0 -- active, 1 -- monitor, 3 -- sleep */    
@@ -76,8 +84,8 @@ static struct early_suspend ft5406_power;
 #define FT5X0X_REG_NOISE_MODE     0xb2         /* to enable or disable power noise, 1 -- enable, 0 -- disable */
 #define SCREEN_MAX_X              1024
 #define SCREEN_MAX_Y              768
-#define PRESS_MAX                 200
-#define FT5X0X_NAME	              "ft5x0x_ts"//"synaptics_i2c_rmi"//"synaptics-rmi-ts"// 
+#define PRESS_MAX                 255
+#define FT5X0X_NAME	              "ft5406_ts"//"synaptics_i2c_rmi"//"synaptics-rmi-ts"// 
 #define TOUCH_MAJOR_MAX           200
 #define WIDTH_MAJOR_MAX           200
 //FT5X0X_REG_PMODE
@@ -135,6 +143,7 @@ static struct i2c_client *this_client;
 static u8 CTPM_FW[]=
 {
 //#include "ft_app.i"
+//#include "pb-8020-0x10-1202.i"
 };
 
 typedef enum
@@ -519,14 +528,204 @@ E_UPGRADE_ERR_TYPE  fts_ctpm_fw_upgrade(u8* pbt_buf, int dw_lenth)
 
 
 /***********************************************************************/
+void delay_qt_ms(unsigned long  w_ms)
+{
+    unsigned long i;
+    unsigned long j;
 
-int fts_ctpm_fw_upgrade_with_i_file(void)
+    for (i = 0; i < w_ms; i++)
+    {
+        for (j = 0; j < 1000; j++)
+        {
+            udelay(1);
+        }
+    }
+}
+
+static int ft5x0x_i2c_rxdata(char *rxdata, int length)
+{
+	int ret;
+
+	struct i2c_msg msgs[] = {
+		{
+			.addr	= this_client->addr,
+			.flags	= 0,
+			.len	= 1,
+			.buf	= rxdata,
+			.scl_rate = FT5406_IIC_SPEED,
+		},
+		{
+			.addr	= this_client->addr,
+			.flags	= I2C_M_RD,
+			.len	= length,
+			.buf	= rxdata,
+			.scl_rate = FT5406_IIC_SPEED,
+		},
+	};
+
+    //msleep(1);
+	ret = i2c_transfer(this_client->adapter, msgs, 2);
+	if (ret < 0)
+		pr_err("msg %s i2c read error: %d\n", __func__, ret);
+	
+	return ret;
+}
+/***********************************************************************************************
+Name	:	 
+
+Input	:	
+                     
+
+Output	:	
+
+function	:	
+
+***********************************************************************************************/
+static int ft5x0x_i2c_txdata(char *txdata, int length)
+{
+	int ret;
+
+	struct i2c_msg msg[] = {
+		{
+			.addr	= this_client->addr,
+			.flags	= 0,
+			.len	= length,
+			.buf	= txdata,
+			.scl_rate = FT5406_IIC_SPEED,
+		},
+	};
+
+   	//msleep(1);
+	ret = i2c_transfer(this_client->adapter, msg, 1);
+	if (ret < 0)
+		pr_err("%s i2c write error: %d\n", __func__, ret);
+
+	return ret;
+}
+/***********************************************************************************************
+Name	:	 ft5x0x_write_reg
+
+Input	:	addr -- address
+                     para -- parameter
+
+Output	:	
+
+function	:	write register of ft5x0x
+
+***********************************************************************************************/
+static int ft5x0x_write_reg(u8 addr, u8 para)
+{
+    u8 buf[3];
+    int ret = -1;
+
+    buf[0] = addr;
+    buf[1] = para;
+    ret = ft5x0x_i2c_txdata(buf, 2);
+    if (ret < 0) {
+        pr_err("write reg failed! %#x ret: %d", buf[0], ret);
+        return -1;
+    }
+    
+    return 0;
+}
+
+
+/***********************************************************************************************
+Name	:	ft5x0x_read_reg 
+
+Input	:	addr
+                     pdata
+
+Output	:	
+
+function	:	read register of ft5x0x
+
+***********************************************************************************************/
+static int ft5x0x_read_reg(u8 addr, u8 *pdata)
+{
+	int ret;
+	u8 buf[2];
+	struct i2c_msg msgs[2];
+
+    //
+	buf[0] = addr;    //register address
+	
+	msgs[0].addr = this_client->addr;
+	msgs[0].flags = 0;
+	msgs[0].len = 1;
+	msgs[0].buf = buf;
+	msgs[1].addr = this_client->addr;
+	msgs[1].flags = I2C_M_RD;
+	msgs[1].len = 1;
+	msgs[1].buf = buf;
+
+	ret = i2c_transfer(this_client->adapter, msgs, 2);
+	if (ret < 0)
+		pr_err("msg %s i2c read error: %d\n", __func__, ret);
+
+	*pdata = buf[0];
+	return ret;
+  
+}
+
+
+int fts_ctpm_auto_clb(void)
+{
+    unsigned char uc_temp;
+    unsigned char i ;
+
+    printk("[FTS] start auto CLB.\n");
+    msleep(200);
+    ft5x0x_write_reg(0, 0x40);  
+    delay_qt_ms(100);   //make sure already enter factory mode
+    ft5x0x_write_reg(2, 0x4);  //write command to start calibration
+    delay_qt_ms(300);
+    for(i=0;i<100;i++)
+    {
+        ft5x0x_read_reg(0,&uc_temp);
+        if ( ((uc_temp&0x70)>>4) == 0x0)  //return to normal mode, calibration finish
+        {
+            break;
+        }
+        delay_qt_ms(200);
+        printk("[FTS] waiting calibration %d\n",i);
+        
+    }
+    printk("[FTS] calibration OK.\n");
+    
+    msleep(300);
+    ft5x0x_write_reg(0, 0x40);  //goto factory mode
+    delay_qt_ms(100);   //make sure already enter factory mode
+    ft5x0x_write_reg(2, 0x5);  //store CLB result
+    delay_qt_ms(300);
+    ft5x0x_write_reg(0, 0x0); //return to normal mode 
+    msleep(300);
+    printk("[FTS] store CLB result OK.\n");
+    return 0;
+}
+
+
+static int fts_ctpm_fw_upgrade_with_i_file(void)
 {
    u8*     pbt_buf = 0;
    int i_ret;
     
    pbt_buf = CTPM_FW;
    i_ret =  fts_ctpm_fw_upgrade(pbt_buf,sizeof(CTPM_FW));
+   //加校准
+ 
+   if (i_ret != 0)
+   {
+       printk("[FTS] upgrade failed i_ret = %d.\n", i_ret);
+       //error handling ...
+       //TBD
+   }
+   else
+   {
+       printk("[FTS] upgrade successfully.\n");
+       fts_ctpm_auto_clb();  //start auto CLB
+       fts_ctpm_auto_clb();  //start auto CLB
+   }
    
    return i_ret;
 }
@@ -538,7 +737,7 @@ unsigned char fts_ctpm_get_upg_ver(void)
     unsigned int ui_sz;
 	
     ui_sz = sizeof(CTPM_FW);
-    if (ui_sz > 2)
+	    if (ui_sz > 2)
     {
         return CTPM_FW[ui_sz - 2];
     }
@@ -564,13 +763,16 @@ static int ft5406_set_regs(struct i2c_client *client, u8 reg, u8 const buf[], un
 	return ret;
 }
 
+static char last_num =0 ;
+static uint8_t last_track_id[MAX_POINT] = {0};
 static void ft5406_queue_work(struct work_struct *work)
 {
 	struct ft5x0x_ts_data *data = container_of(work, struct ft5x0x_ts_data, pen_event_work);
 	struct tp_event event;
 	u8 start_reg=0x0;
-	u8 buf[32] = {0};
-	int ret,i,offset,points;
+	u8 buf[40] = {0};
+	int ret,i=0,offset,points,j=0;
+	uint8_t track_id[MAX_POINT] = {0};
 		
 #if CONFIG_FT5X0X_MULTITOUCH
 	ret = ft5406_read_regs(data->client,start_reg, buf, 6*MAX_POINT+1);
@@ -583,28 +785,35 @@ static void ft5406_queue_work(struct work_struct *work)
 		return;
 	}
 #if 0
+	printk(".............................\n");
 	for (i=0; i<32; i++) {
 		printk("buf[%d] = 0x%x \n", i, buf[i]);
 	}
 #endif
 	
 	points = buf[2] & 0x07;
-	//dev_info(&data->client->dev, "ft5406_read_and_report_data points = %d\n",points);
+	printk_yj("ft5406_read_and_report_data points = %d\n",points);
 	if (points == 0) {
 #if   CONFIG_FT5X0X_MULTITOUCH
-		input_report_abs(data->input_dev, ABS_MT_TOUCH_MAJOR, 0);
-		input_report_abs(data->input_dev, ABS_MT_WIDTH_MAJOR, 0);
-		//input_mt_sync(data->input_dev);
+				for (i=0;i<last_num;i++)
+				{
+					input_mt_slot(data->input_dev,last_track_id[i]);
+		//			printk("different there go away  %d\n\n",last_track_id[i]);
+					input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, false);
+				}
+
+
 #else
 		input_report_abs(data->input_dev, ABS_PRESSURE, 0);
 		input_report_key(data->input_dev, BTN_TOUCH, 0);
 #endif
 		input_sync(data->input_dev);
 		enable_irq(data->irq);
-		dev_info(&data->client->dev, "ft5406 touch release\n");
+		printk_yj("ft5406 touch release\n");
 		return; 
 	}
 	memset(&event, 0, sizeof(struct tp_event));
+
 #if CONFIG_FT5X0X_MULTITOUCH
 	for(i=0;i<points;i++){
 		offset = i*6+3;
@@ -613,30 +822,40 @@ static void ft5406_queue_work(struct work_struct *work)
 		event.id = (s16)(buf[offset+2] & 0xF0)>>4;
 		event.flag = ((buf[offset+0] & 0xc0) >> 6);
 		event.pressure = 200;
-		if(event.x<=SCREEN_MAX_X && event.y<=SCREEN_MAX_Y){
-			//dev_info(&data->client->dev, 
-			//	"ft5406 multiple report event[%d]:x = %d,y = %d,id = %d,flag = %d,pressure = %d\n",
-			//	i,event.x,event.y,event.id,event.flag,event.pressure);
-			input_report_abs(data->input_dev, ABS_MT_TOUCH_MAJOR, 200);
-			input_report_abs(data->input_dev, ABS_MT_POSITION_X,  event.x);
-			input_report_abs(data->input_dev, ABS_MT_POSITION_Y,  event.y);
-			input_report_abs(data->input_dev, ABS_MT_TRACKING_ID, event.id);
-			input_report_abs(data->input_dev, ABS_MT_WIDTH_MAJOR, 1);
-			input_mt_sync(data->input_dev);
-		}
+		track_id[i] = event.id;
+
+		input_mt_slot(data->input_dev, event.id);
+		input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, true);
+		input_report_abs(data->input_dev, ABS_MT_TOUCH_MAJOR, 200);		
+		input_report_abs(data->input_dev, ABS_MT_POSITION_X,  event.x);
+		input_report_abs(data->input_dev, ABS_MT_POSITION_Y,  event.y);
+		//	input_report_abs(data->input_dev, ABS_MT_TRACKING_ID, event.id);
+		//	input_report_abs(data->input_dev, ABS_MT_WIDTH_MAJOR, 1);
+		//	input_mt_sync(data->input_dev);
 	}
-#else
-	event.x = (s16)(buf[3] & 0x0F)<<8 | (s16)buf[4];
-	event.y = (s16)(buf[5] & 0x0F)<<8 | (s16)buf[6];
-	event.pressure =200;
-	input_report_abs(data->input_dev, ABS_X, event.x);
-	input_report_abs(data->input_dev, ABS_Y, event.y);
-	input_report_abs(data->input_dev, ABS_PRESSURE, event.pressure);
-	input_report_key(data->input_dev, BTN_TOUCH, 1);
-	//dev_info(&data->client->dev, "ft5406 single report event:x = %d,y = %d\n",event.x,event.y);
+#if 1
+	if (points <= last_num)
+	{
+			for (i=0; i<last_num; i++)
+			{
+				if (last_track_id[i] != track_id[j])
+				{
+					input_mt_slot(data->input_dev,last_track_id[i]);
+		//			printk("there go away  %d\n\n",last_track_id[i]);
+					input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, false);
+				}
+				else
+				{
+					j++;					
+				}
+			}
+	}
+#endif	
+	memcpy(last_track_id,track_id,MAX_POINT);
+
 #endif
-	//dev_info(&data->client->dev, "ft5406 sync\n",event.x,event.y);
 	input_sync(data->input_dev);
+	last_num = points;
 	enable_irq(data->irq);
 	return;
 }
@@ -646,7 +865,7 @@ static irqreturn_t ft5406_interrupt(int irq, void *dev_id)
 	struct ft5x0x_ts_data *ft5x0x_ts = dev_id;
 
 	disable_irq_nosync(ft5x0x_ts->irq);
-	if (!work_pending(&ft5x0x_ts->pen_event_work)) 
+//	if (!work_pending(&ft5x0x_ts->pen_event_work)) 
 		queue_work(ft5x0x_ts->ts_workqueue, &ft5x0x_ts->pen_event_work);
 	return IRQ_HANDLED;
 }
@@ -658,9 +877,11 @@ static int ft5406_suspend(struct i2c_client *client, pm_message_t mesg)
 	
 	if (pdata->platform_sleep)                              
 		pdata->platform_sleep();
+	//gpio_set_value(RK29_PIN6_PD3, 1);
 	disable_irq(ft5x0x_ts->irq);
 	return 0;
 }
+extern void rk29_judge_charging(void);
 
 
 static int ft5406_resume(struct i2c_client *client)
@@ -669,6 +890,7 @@ static int ft5406_resume(struct i2c_client *client)
 	struct ft5406_platform_data *pdata = client->dev.platform_data;
 	
 	enable_irq(ft5x0x_ts->irq);
+	//gpio_set_value(RK29_PIN6_PD3, 0);
 	if (pdata->platform_wakeup)                              
 		pdata->platform_wakeup();
 	return 0;
@@ -676,11 +898,13 @@ static int ft5406_resume(struct i2c_client *client)
 
 static void ft5406_suspend_early(struct early_suspend *h)
 {
+	dev_info(&this_client->dev, "ft5406_suspend_early!\n");
 	ft5406_suspend(this_client,PMSG_SUSPEND);
 }
 
 static void ft5406_resume_early(struct early_suspend *h)
 {
+	dev_info(&this_client->dev, "ft5406_resume_early!\n");
 	ft5406_resume(this_client);
 }
 static int __devexit ft5406_remove(struct i2c_client *client)
@@ -711,7 +935,7 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 	const u8 buf_test[1] = {0};
     unsigned char reg_value;
     unsigned char reg_version;
-
+  
 	dev_info(&client->dev, "ft5x0x_ts_probe!\n");
 	if (!pdata) {
 		dev_err(&client->dev, "platform data is required!\n");
@@ -755,16 +979,22 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 	ft5x0x_ts->input_dev = input_dev;
 
   #if   CONFIG_FT5X0X_MULTITOUCH
+  	__set_bit(INPUT_PROP_DIRECT, input_dev->propbit);
+	__set_bit(EV_ABS,input_dev->evbit);
+
+	input_mt_init_slots(input_dev, MAX_POINT);
+#if 0	
 	set_bit(ABS_MT_POSITION_X, input_dev->absbit);
 	set_bit(ABS_MT_POSITION_Y, input_dev->absbit);
 	set_bit(ABS_MT_TOUCH_MAJOR, input_dev->absbit);
 	set_bit(ABS_MT_TRACKING_ID, input_dev->absbit);
 	set_bit(ABS_MT_WIDTH_MAJOR, input_dev->absbit);
+#endif
 	input_set_abs_params(input_dev,ABS_MT_POSITION_X, 0, SCREEN_MAX_X, 0, 0);
 	input_set_abs_params(input_dev,ABS_MT_POSITION_Y, 0, SCREEN_MAX_Y, 0, 0);
 	input_set_abs_params(input_dev,ABS_MT_TOUCH_MAJOR, 0, TOUCH_MAJOR_MAX, 0, 0);
-	input_set_abs_params(input_dev,ABS_MT_TRACKING_ID, 0, MAX_POINT, 0, 0);
-	input_set_abs_params(input_dev,ABS_MT_WIDTH_MAJOR, 0, WIDTH_MAJOR_MAX, 0, 0);
+	//input_set_abs_params(input_dev,ABS_MT_TRACKING_ID, 0, MAX_POINT, 0, 0);
+	//input_set_abs_params(input_dev,ABS_MT_WIDTH_MAJOR, 0, WIDTH_MAJOR_MAX, 0, 0);
 #else
 	set_bit(ABS_X, input_dev->absbit);
 	set_bit(ABS_Y, input_dev->absbit);
@@ -794,6 +1024,7 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 		ft5x0x_ts->irq = gpio_to_irq(ft5x0x_ts->irq);
 	}
 
+	//printk("client->dev.driver->name %s  ,%d \n",client->dev.driver->name,ft5x0x_ts->irq);
 	//INIT_WORK(&ft5x0x_ts->pen_event_work, ft5406_ts_pen_irq_work);
 	INIT_WORK(&ft5x0x_ts->pen_event_work, ft5406_queue_work);
 	ft5x0x_ts->ts_workqueue = create_singlethread_workqueue("ft5x0x_ts");
@@ -803,17 +1034,21 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 	}
 
 	/***wait CTP to bootup normally***/
-	 msleep(200); 
-#if 0	 
+	// msleep(200); 
+	 
+//just for update,升级完，需要校准。
+/*	 
 	 fts_register_read(FT5X0X_REG_FIRMID, &reg_version,1);
-	 printk("[TSP] firmware version = 0x%2x\n", reg_version);
+	 printk("[TSP] firmware version = 0x%x\n", reg_version);
 	 fts_register_read(FT5X0X_REG_REPORT_RATE, &reg_value,1);
+	 //max rate == 13,  实际频率为reg_value*10
+	 // 软件也可以通过写该寄存器来改变rate
 	 printk("[TSP]firmware report rate = %dHz\n", reg_value*10);
 	 fts_register_read(FT5X0X_REG_THRES, &reg_value,1);
 	 printk("[TSP]firmware threshold = %d\n", reg_value * 4);
 	 fts_register_read(FT5X0X_REG_NOISE_MODE, &reg_value,1);
 	 printk("[TSP]nosie mode = 0x%2x\n", reg_value);
-
+ 
 	  if (fts_ctpm_get_upg_ver() != reg_version)  
 	  {
 		  printk("[TSP] start upgrade new verison 0x%2x\n", fts_ctpm_get_upg_ver());
@@ -832,7 +1067,19 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 		  }
 		  msleep(4000);
 	  }
-#endif
+	  if (reg_value != 8)
+	  {
+		  ft5x0x_write_reg(FT5X0X_REG_REPORT_RATE, 8);  
+		  delay_qt_ms(100);   //make sure already enter factory mode
+		  fts_register_read(FT5X0X_REG_REPORT_RATE, &reg_value,1);
+		  //max rate == 13,  实际频率为reg_value*10
+		  // 软件也可以通过写该寄存器来改变rate
+		  printk("[TSP]firmware report rate = %dHz now \n", reg_value*10);
+
+
+	  }
+
+*/
 	//printk("client->dev.driver->name %s  ,%d \n",client->dev.driver->name,ft5x0x_ts->irq);
 	ret = request_irq(ft5x0x_ts->irq, ft5406_interrupt, IRQF_TRIGGER_FALLING, client->dev.driver->name, ft5x0x_ts);
 	if (ret < 0) {
@@ -850,7 +1097,7 @@ static int  ft5406_probe(struct i2c_client *client ,const struct i2c_device_id *
 	err = ft5406_set_regs(client,0x88,buf_w,1);
 	buf_r[0] = 0;
 	err = ft5406_read_regs(client,0x88,buf_r,1);
-//	printk("read buf[0x88] = %d\n", buf_r[0]);
+
     return 0;
 
 	i2c_set_clientdata(client, NULL);
@@ -871,7 +1118,14 @@ exit_i2c_test_fail:
 	return err;
 }
 
+static int  ft5406_shutdown(struct i2c_client *client)
+{
+	int ret  = 0 ;
+	printk("%s....................%s\n",__FUNCTION__,__FUNCTION__);
 
+	ft5406_suspend(client,PMSG_SUSPEND);
+	
+}
 
 static struct i2c_device_id ft5406_idtable[] = {
 	{ FT5X0X_NAME, 0 },
@@ -888,6 +1142,7 @@ static struct i2c_driver ft5406_driver  = {
 	.id_table	= ft5406_idtable,
 	.probe      = ft5406_probe,
 	.remove 	= __devexit_p(ft5406_remove),
+	.shutdown     =ft5406_shutdown,
 };
 
 static int __init ft5406_ts_init(void)
@@ -904,7 +1159,7 @@ static void __exit ft5406_ts_exit(void)
 
 /***********************************************************************/
 
-module_init(ft5406_ts_init);
+device_initcall_sync(ft5406_ts_init);
 module_exit(ft5406_ts_exit);
 
 MODULE_AUTHOR("<wenfs@Focaltech-systems.com>");

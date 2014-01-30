@@ -1899,10 +1899,10 @@ static struct i2c_board_info __initdata board_i2c2_devices[] = {
 #endif
 #if defined (CONFIG_TOUCHSCREEN_FT5406)
     {
-		.type	="ft5x0x_ts",
+		.type	="ft5406_ts",
 		.addr 	= 0x38,    //0x70,
 		.flags      =0,
-		.irq	=RK29_PIN0_PA2, // support goodix tp detect, 20110706
+		.irq		=RK29_PIN0_PA2, // support goodix tp detect, 20110706
 		.platform_data = &ft5406_info,
     },
 #endif
