@@ -1,0 +1,10 @@
+config SNAPPY_COMPRESS
+	bool "Snappy compression support"
+	depends on ZRAM
+	default n
+
+config SNAPPY_DECOMPRESS
+	bool "Sanppy decompresion support"
+	depends on ZRAM
+	default n
+
