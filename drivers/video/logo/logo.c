@@ -155,7 +155,16 @@ const struct linux_logo * __init_refok fb_find_logo(int depth)
 		logo = &logo_m32r_clut224;
 #endif
 #ifdef CONFIG_LOGO_CRUZ_CLUT224
-                logo = &logo_cruz_clut224;
+        logo = &logo_cruz_clut224;
+#endif
+#ifdef CONFIG_LOGO_CRK_BIG_CLUT224
+		logo = &logo_crk_big_clut224;
+#endif
+#ifdef CONFIG_LOGO_CRK_MEDIUM_CLUT224
+		logo = &logo_crk_medium_clut224;
+#endif
+#ifdef CONFIG_LOGO_CRK_SMALL_CLUT224
+		logo = &logo_crk_small_clut224;
 #endif
 	logo->width = ((logo->data[0] << 8) + logo->data[1]);
         logo->height = ((logo->data[2] << 8) + logo->data[3]);

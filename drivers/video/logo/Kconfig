@@ -120,4 +120,19 @@ config LOGO_PASCAL2_CLUT224
 	bool "BQ PASCAL 2 logo"
 	default n
 
+config LOGO_CRK_BIG_CLUT224
+        bool "224-color CrewRKTablets logo big"
+        default n
+
+config LOGO_CRK_MEDIUM_CLUT224
+        bool "224-color CrewRKTablets logo medium"
+        default n
+
+config LOGO_CRK_SMALL_CLUT224
+        bool "224-color CrewRKTablets logo small"
+        default n
+
+config FB_LOGO_CENTERED
+        bool "Show the logo centered in the screen"
+        default n
 endif # LOGO
