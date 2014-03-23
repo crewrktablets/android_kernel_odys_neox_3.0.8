@@ -1093,6 +1093,11 @@ config SOC_CAMERA_FCAM
 	help
 	  ha ha
 
+config FCAM_NEXT8PSEHD
+	bool "FCAM support next8psehd"
+	depends on SOC_CAMERA_FCAM
+	default n
+
 config SOC_CAMERA_BCAM
 	tristate "BCAM support"
 	depends on SOC_CAMERA && I2C

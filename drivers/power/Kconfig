@@ -296,14 +296,14 @@ config BATTERY_RK29_ADC
 	tristate "RK29 ADC Battery"
 	depends on ADC_RK29
 	help
-	  Say Y to enable support for the battery on the RK2918.
+	  Say Y to enable support for the adc battery on the RK2918.
 
 config BATTERY_RK2918
-	bool "rk2918 adc battery by BQ"
+	bool "rk2918 battery"
 	depends on ADC_RK29
 	default y
 	help
-	  Say Y here to use rk2918 by BQ adc battery
+	  Say Y here to use rk2918 battery
 
 
 config BATTERY_RK29_AC_CHARGE

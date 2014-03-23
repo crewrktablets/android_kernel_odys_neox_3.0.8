@@ -552,7 +552,11 @@ static struct reginfo sensor_init_data[] =
 
 	//-------------H_V_Switch(4)---------------//
 #if defined(JB422_KERNEL)
+#if defined(CONFIG_FCAM_NEXT8PSEHD)
+			{0x14, 0x10},
+#else
 			{0x14, 0x13},
+#endif
 #else
 			{0x14 , 0x10 | (GC0308_MIRROR << 1) | GC0308_FLIP},  //0x10
 #endif
