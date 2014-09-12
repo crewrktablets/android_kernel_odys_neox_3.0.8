@@ -311,7 +311,11 @@
  *                  CAMERA SENSOR
  *
  **************************************************/
+#if defined CONFIG_SOC_CAMERA_BCAM
+#define CONFIG_SENSOR_0 RK29_CAM_SENSOR_BCAM  /* back camera sensor */
+#else
 #define CONFIG_SENSOR_0 RK29_CAM_SENSOR_OV5642			/* back camera sensor */
+#endif
 #define CONFIG_SENSOR_IIC_ADDR_0 	    0x78
 #define CONFIG_SENSOR_IIC_ADAPTER_ID_0    1
 #define CONFIG_SENSOR_ORIENTATION_0       90
