@@ -81,11 +81,18 @@
 #if defined(CONFIG_MACH_RK29_ODYS_Q) || defined(CONFIG_MACH_RK29_BQ_KEPLER2HD)
 #define PMEM_GPU_SIZE       SZ_128M /* (128*SZ_1M)*/
 #define PMEM_UI_SIZE        SZ_48M /* (74 * SZ_1M)  1280x800: 64M 1024x768: 48M ... */
+#elif defined(CONFIG_MACH_RK29_AOSONM12_512M)
+#define PMEM_GPU_SIZE       (16*SZ_1M) /* (128*SZ_1M) */
+#define PMEM_UI_SIZE        (48*SZ_1M) /* (74 * SZ_1M)  1280x800: 64M 1024x768: 48M ... */
 #else
 #define PMEM_GPU_SIZE       SZ_64M /* (128*SZ_1M)*/
 #define PMEM_UI_SIZE        SZ_32M /* (74 * SZ_1M)  1280x800: 64M 1024x768: 48M ... */
 #endif
+#ifdef CONFIG_MACH_RK29_AOSONM12_512M
+#define PMEM_VPU_SIZE       (40*SZ_1M)
+#else
 #define PMEM_VPU_SIZE       SZ_64M
+#endif
 #define PMEM_SKYPE_SIZE     0 //SZ_8M /* 0*/
 #define PMEM_CAM_SIZE       0x01300000 /* PMEM_CAM_NECESSARY */
 #ifdef CONFIG_VIDEO_RK29_WORK_IPP
