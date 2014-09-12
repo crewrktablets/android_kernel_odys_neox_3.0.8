@@ -1084,7 +1084,11 @@ static struct mma8452_platform_data mma8452_info = {
   .swap_xyz = 1,
   .init_platform_hw= mma8452_init_platform_hw,
  // .orientation = { -1, 0, 0, 0, 0, 1, 0, 1, 0},
+#if defined(CONFIG_MACH_RK29_AOSONM12_512M)
+  .orientation = { 0, 1, 0, 1, 0, 0, 0, 0, -1},
+#else
   .orientation = { 0, -1, 0, 0, 0, -1, -1, 0, 0},
+#endif
 //  .orientation = { 0,-1, 0,  -1, 0, 0,  0, 0,-1},
 };
 #endif
@@ -1713,7 +1717,11 @@ static struct i2c_board_info __initdata board_i2c0_devices[] = {
 #if defined (CONFIG_GS_MMA8452)
     {
       .type           = "gs_mma8452",
+#if defined(CONFIG_MACH_RK29_AOSONM12_512M)
+      .addr           = 0x1c,
+#else
       .addr           = 0x2a,
+#endif
       .flags          = 0,
       .irq            = MMA8452_INT_PIN,
       .platform_data  = &mma8452_info,

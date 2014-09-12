@@ -53,6 +53,12 @@ config MACH_RK29_BQ_KEPLER2HD
         help
           Support for the ROCKCHIP RK2918 based Android Tablet BQ Kepler 2 HD.
 
+config MACH_RK29_AOSONM12_512M
+        depends on ARCH_RK29
+        bool "ROCKCHIP Board Rk29 For Aoson M12(vA.512Mb)"
+        help
+          Support for the ROCKCHIP RK2918 based Android Tablet Aoson M12(vA.512Mb).
+
 config MACH_RK29_K97
         depends on ARCH_RK29
         bool "ROCKCHIP Board Rk29 For K97"
