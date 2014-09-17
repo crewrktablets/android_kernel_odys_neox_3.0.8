@@ -1,5 +1,6 @@
 /* Credits */
-/* Authored by Fenisu */
+/* Correct Pins for Aoson M12-512MB by Fenisu */
+/* Note: Keep irrelevant buttons and order for long-press volume control to work */
 /*--------------------*/
 #include <mach/key.h>
 #include <mach/gpio.h>
@@ -17,6 +18,7 @@ static struct rk29_keys_button key_button[] = {
 		.code	= EV_MENU,
 		.gpio	= RK29_PIN6_PA0,
 		.active_low = PRESS_LEV_LOW,
+		.code_long_press = KEY_VOLUMEDOWN,	
 	},
 	{
 		.desc	= "vol+",
@@ -47,6 +49,7 @@ static struct rk29_keys_button key_button[] = {
 		.code	= KEY_BACK,
 		.gpio	= RK29_PIN6_PA5,
 		.active_low = PRESS_LEV_LOW,
+		.code_long_press = KEY_VOLUMEUP,	
 	},
 	{
 		.desc	= "sensor",
@@ -55,7 +58,7 @@ static struct rk29_keys_button key_button[] = {
 		.active_low = PRESS_LEV_LOW,
 	},
 	{
-		.desc	= "play",
+		.desc	= "power",		
 		.code	= KEY_POWER,
 		.gpio	= RK29_PIN6_PA7,
 		.active_low = PRESS_LEV_LOW,
